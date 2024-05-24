@@ -10,7 +10,7 @@ internal let package = Package(
             name: "FoundationMacros",
             targets: [
                 "Init",
-                "SetupCoreDataAttributes"
+                "SetupModelAttributes"
             ]
         ),
     ],
@@ -30,7 +30,7 @@ internal let package = Package(
             ]
         ),
         .macro(
-            name: "CoreDataAttributesConvenienceSetupMacro",
+            name: "SetupModelAttributesMacro",
             dependencies: [
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
@@ -41,13 +41,13 @@ internal let package = Package(
             dependencies: ["InitMacro"]
         ),
         .target(
-            name: "SetupCoreDataAttributes",
-            dependencies: ["CoreDataAttributesConvenienceSetupMacro"]
+            name: "SetupModelAttributes",
+            dependencies: ["SetupModelAttributesMacro"]
         ),
         .testTarget(
-            name: "SetupCoreDataAttributesTests",
+            name: "SetupModelAttributesTests",
             dependencies: [
-                "CoreDataAttributesConvenienceSetupMacro",
+                "SetupModelAttributesMacro",
                 .product(name: "MacroTesting", package: "swift-macro-testing"),
             ]
         )

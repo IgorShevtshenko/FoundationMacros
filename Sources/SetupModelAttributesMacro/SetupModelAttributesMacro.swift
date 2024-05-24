@@ -3,7 +3,7 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
-internal enum CoreDataAttributesConvenienceSetupError: CustomStringConvertible, Error {
+internal enum SetupModelAttributesError: CustomStringConvertible, Error {
 
     case onlyApplicableToClasses
     case invalidSyntax
@@ -18,7 +18,7 @@ internal enum CoreDataAttributesConvenienceSetupError: CustomStringConvertible, 
     }
 }
 
-public struct CoreDataAttributesConvenienceSetupMacro: ExtensionMacro {
+public struct SetupModelAttributesMacro: ExtensionMacro {
         
     public static func expansion(
         of node: AttributeSyntax,
@@ -27,10 +27,10 @@ public struct CoreDataAttributesConvenienceSetupMacro: ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
-        guard let structDecl = declaration as? ClassDeclSyntax else {
-            throw CoreDataAttributesConvenienceSetupError.onlyApplicableToClasses
+        guard let classDecl = declaration as? ClassDeclSyntax else {
+            throw SetupModelAttributesError.onlyApplicableToClasses
         }
-        let members = structDecl.memberBlock.members
+        let members = classDecl.memberBlock.members
         let variables = members
             .compactMap { $0.decl.as(VariableDeclSyntax.self) }
             .filter { $0.isVar }
@@ -66,7 +66,9 @@ public struct CoreDataAttributesConvenienceSetupMacro: ExtensionMacro {
     }
 
     @CodeBlockItemListBuilder
-    private static func buildFunctionBody(variablesName: [PatternSyntax]) -> CodeBlockItemListSyntax {
+    private static func buildFunctionBody(
+        variablesName: [PatternSyntax]
+    ) -> CodeBlockItemListSyntax {
         for name in variablesName {
             ExprSyntax("\nself.\(name) = \(name)")
         }
@@ -81,9 +83,9 @@ private extension VariableDeclSyntax {
 }
 
 @main
-internal struct CoreDataAttributesConvenienceSetup: CompilerPlugin {
+internal struct SetupModelAttributes: CompilerPlugin {
 
     let providingMacros: [Macro.Type] = [
-        CoreDataAttributesConvenienceSetupMacro.self,
+        SetupModelAttributesMacro.self,
     ]
 }
